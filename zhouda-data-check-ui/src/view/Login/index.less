@@ -1,0 +1,105 @@
+.dv-login {
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse 70% 55% at 15% 20%, rgba(13, 148, 136, 0.35), transparent 55%),
+        radial-gradient(ellipse 55% 45% at 90% 80%, rgba(30, 58, 138, 0.28), transparent 50%),
+        linear-gradient(155deg, #0F172A 0%, #1E293B 42%, #134E4A 100%);
+}
+
+.dv-login__grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 20%, transparent 75%);
+    pointer-events: none;
+    animation: zd-grid-drift 28s linear infinite;
+}
+
+@keyframes zd-grid-drift {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(-48px, -48px, 0); }
+}
+
+.dv-login-btn {
+    margin: 0;
+    text-align: right;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.dv-login-containner {
+    margin: 0 auto;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    padding: 24px;
+}
+
+.dv-register-btn {
+    color: #0F766E !important;
+    font-weight: 500;
+}
+
+.dv-login-wrap {
+    background: rgba(248, 250, 252, 0.96) !important;
+    width: min(420px, 100%);
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    box-shadow: 0 24px 64px rgba(15, 23, 42, 0.35) !important;
+    animation: zd-login-rise 0.55s ease-out;
+}
+
+@keyframes zd-login-rise {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dv-login-title {
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 30px !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.03em;
+    text-align: center;
+    color: #0F766E !important;
+    margin: 0 !important;
+}
+
+.dv-login-tagline {
+    text-align: center;
+    color: #64748b;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-size: 11px !important;
+    margin-top: 6px;
+}
+
+.dv-login-submit {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    min-width: 120px;
+}
+
+.dv-login__switch-language {
+    position: absolute;
+    right: 28px;
+    top: 28px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #e2e8f0;
+    cursor: pointer;
+    z-index: 2;
+}

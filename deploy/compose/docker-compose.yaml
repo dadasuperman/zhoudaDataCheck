@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  ZhoudaDataCheck:
+    image: ZhoudaDataCheck:dev
+    container_name: ZhoudaDataCheck
+    ports:
+      - 5600:5600
+    env_file: .env
+    privileged: true
+    restart: unless-stopped
+    networks:
+      - ZhoudaDataCheck
+
+networks:
+  ZhoudaDataCheck:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/24

@@ -1,0 +1,73 @@
+.zd-aside {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 4px 0 12px;
+    color: #e2e8f0;
+}
+
+.zd-aside--collapsed {
+    .yh-brand {
+        text-align: center;
+        margin: 0 4px 12px;
+        font-size: 16px;
+        letter-spacing: 0;
+    }
+    .zd-navlink {
+        justify-content: center;
+        padding-inline: 8px;
+    }
+}
+
+.zd-navlink {
+    border-radius: 8px !important;
+    color: #cbd5e1 !important;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13.5px;
+    font-weight: 500;
+
+    &[data-active] {
+        background: rgba(13, 148, 136, 0.28) !important;
+        color: #f0fdfa !important;
+        font-weight: 600;
+    }
+
+    &:hover {
+        background: rgba(148, 163, 184, 0.12) !important;
+    }
+}
+
+.zd-aside__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px 4px;
+    margin-top: auto;
+}
+
+.dv-user {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(145deg, #0D9488, #134E4A);
+    color: #f8fafc;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.35);
+}
+
+.dv-user--panel {
+    cursor: default;
+    box-shadow: none;
+}
+
+.escape {
+    opacity: 0.9;
+    border-radius: 6px;
+}
