@@ -26,10 +26,9 @@
     <groupId>io.zhoudadatacheck</groupId>
     <artifactId>zhouda-data-check</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <modules>
         <module>zhouda-data-check-common</module>
-        <module>zhouda-data-check-engine</module>
         <module>zhouda-data-check-cli</module>
         <module>zhouda-data-check-connector</module>
         <module>zhouda-data-check-ui</module>
@@ -38,6 +37,7 @@
         <module>zhouda-data-check-notification</module>
         <module>zhouda-data-check-spi</module>
         <module>zhouda-data-check-dist</module>
+        <module>zhouda-data-check-server-common</module>
         <module>zhouda-data-check-server</module>
         <module>zhouda-data-check-registry</module>
         <module>zhouda-data-check-core</module>
@@ -670,6 +670,19 @@
             </dependency>
 
             <dependency>
+                <groupId>io.zhoudadatacheck</groupId>
+                <artifactId>zhouda-data-check-server-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- 闭源：产物来自 libs/，源码不在本仓库 -->
+            <dependency>
+                <groupId>io.zhoudadatacheck</groupId>
+                <artifactId>zhouda-data-check-dqc</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>com.cronutils</groupId>
                 <artifactId>cron-utils</artifactId>
                 <version> ${cron-utils.version}</version>
@@ -876,10 +889,27 @@
     </build>
 
     <repositories>
+        <!--
+          闭源核心（engine、dqc）不以源码形式存在于本仓库。构建产物按 Maven 仓库布局
+          提交在 libs/ 下，由 scripts/publish-core.sh 从 core-private/ 生成。
+          必须在仓库根目录执行 mvn（或依赖已提交的 .mvn/），否则该路径无法定位到 libs/。
+        -->
+        <repository>
+            <id>zhouda-libs</id>
+            <name>zhoudaDataCheck closed-core local repository</name>
+            <url>file://${maven.multiModuleProjectDirectory}/libs</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
         <repository>
             <id>public</id>
             <name>aliyun nexus</name>
-            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+            <url>https://maven.aliyun.com/repository/public</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -901,7 +931,7 @@
         <pluginRepository>
             <id>public</id>
             <name>aliyun nexus</name>
-            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+            <url>https://maven.aliyun.com/repository/public</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -910,4 +940,60 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
+
+    <profiles>
+        <!--
+          构建闭源核心时唯一允许使用的 profile：
+          1) -g:none  —— 不写行号表与局部变量表，反编译拿不到变量名；
+          2) 跳过 maven-source-plugin —— 根 pom 把 attach-sources 绑在了 verify，
+             不加这个开关，mvn deploy 会把 -sources.jar 一起发布进 libs/。
+        -->
+        <profile>
+            <id>core-release</id>
+            <properties>
+                <maven.source.skip>true</maven.source.skip>
+                <maven.javadoc.skip>true</maven.javadoc.skip>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <debug>false</debug>
+                            <debuglevel>none</debuglevel>
+                            <compilerArgs>
+                                <arg>-g:none</arg>
+                            </compilerArgs>
+                        </configuration>
+                    </plugin>
+                    <!--
+                      根 pom 把 attach-sources 绑在 verify，maven-source-plugin 2.4 的
+                      jar-no-fork 不认 maven.source.skip，因此这里按 execution id 摘掉阶段。
+                      只设属性等于没设，会把核心源码一起发进 libs/。
+                    -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

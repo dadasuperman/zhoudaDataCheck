@@ -1,8 +1,6 @@
 /* eslint-disable array-callback-return */
 import React, { memo, useCallback, useState } from 'react';
-import {
-    NavLink, Select, Popover, Stack, Text, Group, UnstyledButton, Divider, ScrollArea,
-} from '@mantine/core';
+import { Menu, Popover, Select } from 'antd';
 import {
     RouteComponentProps, withRouter,
 } from 'react-router-dom';
@@ -10,6 +8,7 @@ import useWatch from '@Editor/common/useWatch';
 import EhPng from 'assets/images/en.svg';
 import ChPng from 'assets/images/ch.svg';
 import './index.less';
+import { LogoutOutlined, PlusOutlined, EditOutlined } from '@ant-design/icons';
 import { useIntl } from 'react-intl';
 import { useSelector, useCommonActions, useWorkSpaceActions } from '@/store';
 import shareData from '@/utils/shareData';
@@ -33,10 +32,9 @@ export type MenuItem = {
 
 interface TMenuAside extends RouteComponentProps {
     menus: MenuItem[]
-    collapsed?: boolean
 }
 
-const MenuAside: React.FC<TMenuAside> = ({ menus, history, collapsed }) => {
+const MenuAside: React.FC<TMenuAside> = ({ menus, history }) => {
     const [activeKeys, setActiveKeys] = useState<string[]>(['']);
     const { workspaceId, spaceList } = useSelector((r) => r.workSpaceReducer);
     const { loginInfo } = useSelector((r) => r.userReducer);
@@ -67,12 +65,10 @@ const MenuAside: React.FC<TMenuAside> = ({ menus, history, collapsed }) => {
         }
     };
     useWatch(menus, () => setActiveKeyRedirect(true), { immediate: true });
-
-    const clickMenuItem = useCallback((key: string) => {
-        setActiveKeys([key]);
-        history.push(key);
+    const clickMenuItem = useCallback((obj: any) => {
+        setActiveKeys(obj.key);
+        history.push(obj.key);
     }, [history]);
-
     const handleMenuClick = () => {
         window.localStorage.removeItem(DV_STORAGE_LOGIN);
         history.push('/login');
@@ -94,46 +90,52 @@ const MenuAside: React.FC<TMenuAside> = ({ menus, history, collapsed }) => {
         show1(val);
     };
 
-    const spaceOptions = (spaceList || []).map((s: any) => ({
-        value: String(s.id),
-        label: s.name,
-    }));
-
-    const userPanel = (
-        <Stack gap="sm" style={{ minWidth: 220 }}>
-            <Group gap="sm">
-                <div className="dv-user dv-user--panel">AD</div>
-                <Text size="sm" fw={600}>Account</Text>
-            </Group>
-            <Divider />
-            <div>
-                <Group justify="space-between" mb={6}>
-                    <Text size="xs" c="dimmed">{intl.formatMessage({ id: 'header_top_workspace' })}</Text>
-                    <UnstyledButton
-                        style={{ fontSize: 12, color: '#0F766E' }}
-                        onClick={() => onShowSpace(undefined)}
-                    >
-                        + {intl.formatMessage({ id: 'common_create_btn' })}
-                    </UnstyledButton>
-                </Group>
+    const content = (
+        <div className="dv-user-popover">
+            <div className="dv-user-popover__head">
+                <span className="dv-user">AD</span>
+                <span className="dv-user-popover__title">Account</span>
+            </div>
+            <div className="dv-user-popover__section">
+                <div className="dv-user-popover__row">
+                    <span>{intl.formatMessage({ id: 'header_top_workspace' })}</span>
+                    <a onClick={() => onShowSpace(undefined)}>
+                        <PlusOutlined style={{ marginRight: 4 }} />
+                        {intl.formatMessage({ id: 'common_create_btn' })}
+                    </a>
+                </div>
                 <Select
-                    size="xs"
-                    data={spaceOptions}
-                    value={workspaceId != null ? String(workspaceId) : null}
-                    onChange={(v) => v && onChangeSpace(Number.isNaN(+v) ? v : +v)}
-                    searchable
+                    showSearch
+                    style={{ width: '100%' }}
+                    filterOption={(input, option) => (option?.children as unknown as string)
+                        ?.toLowerCase?.()
+                        ?.indexOf(input.toLowerCase()) >= 0}
+                    options={(spaceList || []).map((s: any) => ({ label: s.name, value: s.id }))}
+                    value={workspaceId}
+                    onChange={onChangeSpace}
                 />
             </div>
-            <UnstyledButton onClick={() => onShowResetPassword(loginInfo.id)} style={{ fontSize: 13 }}>
+            <div
+                className="dv-user-popover__action"
+                onClick={() => onShowResetPassword(loginInfo.id)}
+            >
+                <EditOutlined style={{ marginRight: 8 }} />
                 {intl.formatMessage({ id: 'common_reset_password' })}
-            </UnstyledButton>
-            <UnstyledButton onClick={handleMenuClick} style={{ fontSize: 13, color: '#b91c1c' }}>
+            </div>
+            <div className="dv-user-popover__action dv-user-popover__action--danger" onClick={handleMenuClick}>
+                <LogoutOutlined style={{ marginRight: 8 }} />
                 {intl.formatMessage({ id: 'common_Logout' })}
-            </UnstyledButton>
-        </Stack>
+            </div>
+        </div>
     );
 
-    const $menus = menus.filter((item) => (!item.menuHide));
+    const $menus = menus.map((item) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { exact, ...rest } = item;
+        return {
+            ...rest,
+        };
+    }).filter((item) => (!item.menuHide)) as MenuItem[];
 
     const { locale } = useSelector((r) => r.commonReducer);
     const { setLocale } = useCommonActions();
@@ -144,47 +146,33 @@ const MenuAside: React.FC<TMenuAside> = ({ menus, history, collapsed }) => {
     };
 
     return (
-        <div className={`zd-aside ${collapsed ? 'zd-aside--collapsed' : ''}`}>
+        <div className="dv-menu">
             <div className="yh-brand">
-                {collapsed ? 'zD' : intl.formatMessage({ id: 'brand_name' })}
-                {!collapsed && <span className="yh-brand__sub">Data Quality Console</span>}
+                {intl.formatMessage({ id: 'brand_name' })}
+                <span className="yh-brand__sub">Data Quality Console</span>
             </div>
-            <ScrollArea style={{ flex: 1 }} offsetScrollbars>
-                <Stack gap={4} px="xs" mt="sm">
-                    {$menus.map((item) => {
-                        const active = activeKeys.includes(item.key as string);
-                        return (
-                            <NavLink
-                                key={item.key}
-                                label={collapsed ? null : item.label}
-                                leftSection={item.icon}
-                                active={active}
-                                onClick={() => clickMenuItem(item.key)}
-                                className="zd-navlink"
-                                variant="filled"
-                                color="teal"
-                            />
-                        );
-                    })}
-                </Stack>
-            </ScrollArea>
-            <div className="zd-aside__footer">
-                {locale === 'zh_CN' ? (
-                    <Ch
-                        style={{ cursor: 'pointer', width: 40 }}
-                        onClick={swichFn}
-                    />
-                ) : (
-                    <Eh
-                        style={{ cursor: 'pointer', width: 40 }}
-                        onClick={swichFn}
-                    />
-                )}
-                <Popover position="right-end" shadow="md" width={260}>
-                    <Popover.Target>
-                        <span className="dv-user" role="button" tabIndex={0}>AD</span>
-                    </Popover.Target>
-                    <Popover.Dropdown>{userPanel}</Popover.Dropdown>
+            <Menu
+                selectedKeys={activeKeys}
+                mode="inline"
+                theme="dark"
+                className="dv-menu-list"
+                onClick={clickMenuItem}
+                items={$menus.map((item) => ({
+                    key: item.key,
+                    icon: item.icon,
+                    label: item.label,
+                }))}
+            />
+            <div className="dv-menu__footer">
+                {
+                    locale === 'zh_CN' ? (
+                        <Ch style={{ cursor: 'pointer', width: 40 }} onClick={swichFn} />
+                    ) : (
+                        <Eh style={{ cursor: 'pointer', width: 40 }} onClick={swichFn} />
+                    )
+                }
+                <Popover content={content} placement="rightBottom" trigger="click" overlayClassName="dv-user-popover-overlay">
+                    <span className="dv-user" role="button" tabIndex={0}>AD</span>
                 </Popover>
             </div>
             <RenderCreateSpace />

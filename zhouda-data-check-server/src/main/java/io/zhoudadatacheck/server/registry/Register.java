@@ -41,7 +41,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class Register {
+public class Register implements SlotProvider {
 
     private final Registry registry;
 

@@ -203,7 +203,7 @@ public class CatalogMetaDataFetchExecutorImpl implements CatalogMetaDataFetchExe
                     // 记录 database added change
                     CatalogSchemaChange databaseAddChange = new CatalogSchemaChange();
                     databaseAddChange.setParentUuid(dataSource.getUuid());
-                    databaseAddChange.setEntityUuid(databaseEntityInstance.getUuid());
+                    databaseAddChange.setEntityUuid(databaseUUID);
                     databaseAddChange.setChangeType(SchemaChangeType.DATABASE_ADDED);
                     databaseAddChange.setDatabaseName(databaseInfo.getName());
                     databaseAddChange.setUpdateTime(LocalDateTime.now());

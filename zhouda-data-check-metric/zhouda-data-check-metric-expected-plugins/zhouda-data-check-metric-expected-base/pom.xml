@@ -24,7 +24,7 @@
     <parent>
         <groupId>io.zhoudadatacheck</groupId>
         <artifactId>zhouda-data-check-metric-expected-plugins</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
 
     <artifactId>zhouda-data-check-metric-expected-base</artifactId>

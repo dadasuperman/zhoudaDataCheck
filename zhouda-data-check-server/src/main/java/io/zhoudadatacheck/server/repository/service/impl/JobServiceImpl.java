@@ -131,7 +131,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
 
         String parameter = jobCreate.getParameter();
         if (StringUtils.isEmpty(parameter)) {
-            throw new ZhoudaDataCheckServerException(Status.JOB_PARAMETER_IS_NULL_ERROR);
+            throw new ZhoudaDataCheckServerException(Status.JOB_PARAMETER_IS_NULL_ERROR, jobNameOrType(jobCreate.getJobName(), jobCreate.getType()));
         }
 
         if (jobCreate.getIsErrorDataOutputToDataSource()!= null && jobCreate.getIsErrorDataOutputToDataSource()) {
@@ -148,7 +148,11 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
         Job job = new Job();
         BeanUtils.copyProperties(jobCreate, job);
         List<BaseJobParameter> jobParameters = JSONUtils.toList(parameter, BaseJobParameter.class);
+        JobParameterUtils.checkMetricTypeSupported(jobParameters);
         jobParameters = JobParameterUtils.regenerateJobParameterList(jobParameters);
+        if (CollectionUtils.isEmpty(jobParameters)) {
+            throw new ZhoudaDataCheckServerException(Status.JOB_PARAMETER_IS_NULL_ERROR, jobNameOrType(jobCreate.getJobName(), jobCreate.getType()));
+        }
         checkDuplicateMetricInJob(jobParameters);
         isMetricSuitable(jobCreate.getDataSourceId(), jobCreate.getDataSourceId2(), jobCreate.getEngineType(), jobParameters);
         List<String> fqnList = setJobAttribute(job, jobParameters);
@@ -198,6 +202,10 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
         return CollectionUtils.isNotEmpty(list);
     }
 
+    private String jobNameOrType(String jobName, String jobType) {
+        return StringUtils.isEmpty(jobName) ? jobType : jobName;
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public long update(JobUpdate jobUpdate) {
@@ -219,6 +227,10 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
 
         BeanUtils.copyProperties(jobUpdate, job);
         List<BaseJobParameter> jobParameters = JSONUtils.toList(jobUpdate.getParameter(), BaseJobParameter.class);
+        if (CollectionUtils.isEmpty(jobParameters)) {
+            throw new ZhoudaDataCheckServerException(Status.JOB_PARAMETER_IS_NULL_ERROR, job.getName());
+        }
+        JobParameterUtils.checkMetricTypeSupported(jobParameters);
         checkDuplicateMetricInJob(jobParameters);
         isMetricSuitable(jobUpdate.getDataSourceId(), jobUpdate.getDataSourceId2(), jobUpdate.getEngineType(), jobParameters);
         List<String> fqnList = setJobAttribute(job, jobParameters);
@@ -285,7 +297,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
         // 需要对参数进行校验，判断插件类型是否存在
         String parameter = dataProfileJobCreateOrUpdate.getParameter();
         if (StringUtils.isEmpty(parameter)) {
-            throw new ZhoudaDataCheckServerException(Status.JOB_PARAMETER_IS_NULL_ERROR);
+            throw new ZhoudaDataCheckServerException(Status.JOB_PARAMETER_IS_NULL_ERROR, dataProfileJobCreateOrUpdate.getType());
         }
 
         Job job = new Job();
@@ -598,7 +610,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
         jobExecution.setJobType(job.getType());
         jobExecution.setErrorDataStorageType(errorDataStorageType);
         jobExecution.setErrorDataStorageParameter(errorDataStorageParameter);
-        jobExecution.setErrorDataFileName(getErrorDataFileName(job.getParameter()));
+        jobExecution.setErrorDataFileName(getErrorDataFileName(job.getName(), job.getParameter()));
         jobExecution.setStatus(ExecutionStatus.WAITING_SUMMIT);
         jobExecution.setTenantCode(tenantStr);
         jobExecution.setEnv(envStr);
@@ -614,13 +626,13 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
         List<BaseJobParameter> jobParameters = JSONUtils.toList(parameter, BaseJobParameter.class);
 
         if (CollectionUtils.isEmpty(jobParameters)) {
-            throw new ZhoudaDataCheckServerException(Status.JOB_PARAMETER_IS_NULL_ERROR);
+            throw new ZhoudaDataCheckServerException(Status.JOB_PARAMETER_IS_NULL_ERROR, jobType);
         }
 
         BaseJobParameter baseJobParameter = jobParameters.get(0);
         Map<String,Object> metricParameter = baseJobParameter.getMetricParameter();
         if (MapUtils.isEmpty(metricParameter)) {
-            throw new ZhoudaDataCheckServerException(Status.JOB_PARAMETER_IS_NULL_ERROR);
+            throw new ZhoudaDataCheckServerException(Status.JOB_PARAMETER_IS_NULL_ERROR, jobType);
         }
 
         ResultFormula resultFormula = PluginDiscovery.getMultiKeyPluginDiscovery(ResultFormula.class, ResultFormula::getPluginNames).getOrCreatePlugin(baseJobParameter.getResultFormula());
@@ -684,17 +696,17 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
         return PasswordFilterUtils.convertPassword(PWD_PATTERN_1,JSONUtils.toJsonString(submitJob));
     }
 
-    private String getErrorDataFileName(String parameter) {
+    private String getErrorDataFileName(String jobName, String parameter) {
         List<BaseJobParameter> jobParameters = JSONUtils.toList(parameter, BaseJobParameter.class);
 
         if (CollectionUtils.isEmpty(jobParameters)) {
-            throw new ZhoudaDataCheckServerException(Status.JOB_PARAMETER_IS_NULL_ERROR);
+            throw new ZhoudaDataCheckServerException(Status.JOB_PARAMETER_IS_NULL_ERROR, jobName);
         }
 
         BaseJobParameter baseJobParameter = jobParameters.get(0);
         Map<String,Object> metricParameter = baseJobParameter.getMetricParameter();
         if (MapUtils.isEmpty(metricParameter)) {
-            throw new ZhoudaDataCheckServerException(Status.JOB_PARAMETER_IS_NULL_ERROR);
+            throw new ZhoudaDataCheckServerException(Status.JOB_PARAMETER_IS_NULL_ERROR, jobName);
         }
 
         String column = (String)metricParameter.get(COLUMN);

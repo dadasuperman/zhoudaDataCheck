@@ -21,6 +21,7 @@ import io.zhoudadatacheck.core.entity.ResultMap;
 import io.zhoudadatacheck.core.enums.Status;
 import io.zhoudadatacheck.core.utils.TokenManager;
 import io.zhoudadatacheck.core.exception.ZhoudaDataCheckServerException;
+import io.zhoudadatacheck.spi.ProviderNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -88,6 +89,16 @@ public class ZhoudaDataCheckExceptionHandler {
         tryRefreshToken(request, resultMap);
         String message = buildValidFailMessage((MethodArgumentNotValidException) e);
         resultMap.message(message);
+        return ResponseEntity.ok(resultMap);
+    }
+
+    @ExceptionHandler(ProviderNotFoundException.class)
+    public ResponseEntity<ResultMap> providerNotFoundExceptionHandler(ProviderNotFoundException e, HttpServletRequest request) {
+        log.warn("No plugin provider available: {}", e.getMessage());
+        ResultMap resultMap = new ResultMap(tokenManager);
+        resultMap.fail(Status.REQUEST_ERROR.getCode());
+        tryRefreshToken(request, resultMap);
+        resultMap.message(Status.REQUEST_ERROR.getMsg());
         return ResponseEntity.ok(resultMap);
     }
 

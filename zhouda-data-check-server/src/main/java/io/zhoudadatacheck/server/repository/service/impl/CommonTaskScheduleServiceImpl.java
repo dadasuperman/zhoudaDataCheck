@@ -91,12 +91,13 @@ public class CommonTaskScheduleServiceImpl extends ServiceImpl<CommonTaskSchedul
         } else {
             if (baseMapper.insert(commonTaskSchedule) <= 0) {
                 log.info("create catalog task schedule fail : {}", commonTaskSchedule);
-                throw new ZhoudaDataCheckServerException(Status.CREATE_CATALOG_TASK_SCHEDULE_ERROR);
+                throw new ZhoudaDataCheckServerException(Status.CREATE_CATALOG_TASK_SCHEDULE_ERROR, dataSourceId);
             }
             try {
                 addScheduleJob(scheduleCreateOrUpdate, commonTaskSchedule);
             } catch (Exception e) {
-                throw new ZhoudaDataCheckServerException(Status.ADD_QUARTZ_ERROR);
+                log.error("add quartz job error, datasource id : {}", commonTaskSchedule.getDataSourceId(), e);
+                throw new ZhoudaDataCheckServerException(Status.ADD_QUARTZ_ERROR, e.getMessage());
             }
         }
         log.info("create job schedule success: datasource id : {}, cronExpression : {}",
@@ -133,14 +134,15 @@ public class CommonTaskScheduleServiceImpl extends ServiceImpl<CommonTaskSchedul
 
         Long dataSourceId = scheduleCreateOrUpdate.getDataSourceId();
         if (dataSourceId == null) {
-            throw new ZhoudaDataCheckServerException(Status.DATASOURCE_NOT_EXIST_ERROR);
+            throw new ZhoudaDataCheckServerException(Status.DATASOURCE_NOT_EXIST_ERROR, dataSourceId);
         }
 
         try {
             quartzExecutor.deleteJob(getScheduleJobInfo(commonTaskSchedule));
             addScheduleJob(scheduleCreateOrUpdate, commonTaskSchedule);
         } catch (Exception e) {
-            throw new ZhoudaDataCheckServerException(Status.ADD_QUARTZ_ERROR);
+            log.error("update catalog task quartz job error, schedule id : {}", commonTaskSchedule.getId(), e);
+            throw new ZhoudaDataCheckServerException(Status.ADD_QUARTZ_ERROR, e.getMessage());
         }
 
 
@@ -197,6 +199,10 @@ public class CommonTaskScheduleServiceImpl extends ServiceImpl<CommonTaskSchedul
     public  List<String> getCron(MapParam mapParam){
         List<String> listCron = new ArrayList<>();
         FunCron api = StrategyFactory.getByType(mapParam.getCycle());
+        if (api == null) {
+            throw new ZhoudaDataCheckServerException(Status.SCHEDULE_TYPE_NOT_VALIDATE_ERROR, mapParam.getCycle());
+        }
+
         CommonTaskSchedule commonTaskSchedule = new CommonTaskSchedule();
         String result1 = JSONUtils.toJsonString(mapParam);
         commonTaskSchedule.setParam(result1);
@@ -210,22 +216,25 @@ public class CommonTaskScheduleServiceImpl extends ServiceImpl<CommonTaskSchedul
         switch (JobScheduleType.of(type)){
             case CYCLE:
                 if (param == null) {
-                    throw new ZhoudaDataCheckServerException(Status.SCHEDULE_PARAMETER_IS_NULL_ERROR);
+                    throw new ZhoudaDataCheckServerException(Status.SCHEDULE_PARAMETER_IS_NULL_ERROR, type);
                 }
 
                 if (param.getCycle() == null) {
-                    throw new ZhoudaDataCheckServerException(Status.SCHEDULE_PARAMETER_IS_NULL_ERROR);
+                    throw new ZhoudaDataCheckServerException(Status.SCHEDULE_PARAMETER_IS_NULL_ERROR, type);
                 }
                 commonTaskSchedule.setStatus(true);
                 commonTaskSchedule.setParam(paramStr);
                 FunCron api = StrategyFactory.getByType(param.getCycle());
+                if (api == null) {
+                    throw new ZhoudaDataCheckServerException(Status.SCHEDULE_TYPE_NOT_VALIDATE_ERROR, param.getCycle());
+                }
                 commonTaskSchedule.setCronExpression(api.funcDeal(commonTaskSchedule.getParam()));
 
                 log.info("job schedule param: {}", paramStr);
                 break;
             case CRONTAB:
                 if (param == null) {
-                    throw new ZhoudaDataCheckServerException(Status.SCHEDULE_PARAMETER_IS_NULL_ERROR);
+                    throw new ZhoudaDataCheckServerException(Status.SCHEDULE_PARAMETER_IS_NULL_ERROR, type);
                 }
 
                 boolean isValid = quartzExecutor.isValid(param.getCrontab());

@@ -1,4 +1,4 @@
-import { message } from '@/ui/bridge';
+import { message } from 'antd';
 
 message.config({
     top: 30,

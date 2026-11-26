@@ -93,18 +93,19 @@ public class JobScheduleServiceImpl extends ServiceImpl<JobScheduleMapper, JobSc
         } else {
             Long dataSourceId = job.getDataSourceId();
             if (dataSourceId == null) {
-                throw new ZhoudaDataCheckServerException(Status.DATASOURCE_NOT_EXIST_ERROR);
+                throw new ZhoudaDataCheckServerException(Status.DATASOURCE_NOT_EXIST_ERROR, dataSourceId);
             }
             try {
                 addScheduleJob(jobScheduleCreate, jobSchedule, job);
             } catch (Exception e) {
-                throw new ZhoudaDataCheckServerException(Status.ADD_QUARTZ_ERROR);
+                log.error("add quartz job error, job id : {}", jobId, e);
+                throw new ZhoudaDataCheckServerException(Status.ADD_QUARTZ_ERROR, e.getMessage());
             }
         }
 
         if (baseMapper.insert(jobSchedule) <= 0) {
             log.info("create job schedule fail : {}", jobScheduleCreate);
-            throw new ZhoudaDataCheckServerException(Status.CREATE_JOB_SCHEDULE_ERROR);
+            throw new ZhoudaDataCheckServerException(Status.CREATE_JOB_SCHEDULE_ERROR, jobSchedule.getJobId());
         }
         log.info("create job schedule success: datasource id : {}, job id :{}, cronExpression : {}",
                 job.getDataSourceId(),
@@ -146,7 +147,7 @@ public class JobScheduleServiceImpl extends ServiceImpl<JobScheduleMapper, JobSc
         } else {
             Long dataSourceId = job.getDataSourceId();
             if (dataSourceId == null) {
-                throw new ZhoudaDataCheckServerException(Status.DATASOURCE_NOT_EXIST_ERROR);
+                throw new ZhoudaDataCheckServerException(Status.DATASOURCE_NOT_EXIST_ERROR, dataSourceId);
             }
 
             try {
@@ -211,6 +212,10 @@ public class JobScheduleServiceImpl extends ServiceImpl<JobScheduleMapper, JobSc
     public  List<String> getCron(MapParam mapParam){
         List<String> listCron = new ArrayList<String>();
         FunCron api = StrategyFactory.getByType(mapParam.getCycle());
+        if (api == null) {
+            throw new ZhoudaDataCheckServerException(Status.SCHEDULE_TYPE_NOT_VALIDATE_ERROR, mapParam.getCycle());
+        }
+
         JobSchedule jobSchedule = new JobSchedule();
         String result1 = JSONUtils.toJsonString(mapParam);
         jobSchedule.setParam(result1);
@@ -229,22 +234,25 @@ public class JobScheduleServiceImpl extends ServiceImpl<JobScheduleMapper, JobSc
         switch (JobScheduleType.of(type)){
             case CYCLE:
                 if (param == null) {
-                    throw new ZhoudaDataCheckServerException(Status.SCHEDULE_PARAMETER_IS_NULL_ERROR);
+                    throw new ZhoudaDataCheckServerException(Status.SCHEDULE_PARAMETER_IS_NULL_ERROR, type);
                 }
 
                 if (param.getCycle() == null) {
-                    throw new ZhoudaDataCheckServerException(Status.SCHEDULE_PARAMETER_IS_NULL_ERROR);
+                    throw new ZhoudaDataCheckServerException(Status.SCHEDULE_PARAMETER_IS_NULL_ERROR, type);
                 }
                 jobSchedule.setStatus(true);
                 jobSchedule.setParam(paramStr);
                 FunCron api = StrategyFactory.getByType(param.getCycle());
+                if (api == null) {
+                    throw new ZhoudaDataCheckServerException(Status.SCHEDULE_TYPE_NOT_VALIDATE_ERROR, param.getCycle());
+                }
                 jobSchedule.setCronExpression(api.funcDeal(paramStr));
 
                 log.info("job schedule param: {}", paramStr);
                 break;
             case CRONTAB:
                 if (param == null) {
-                    throw new ZhoudaDataCheckServerException(Status.SCHEDULE_PARAMETER_IS_NULL_ERROR);
+                    throw new ZhoudaDataCheckServerException(Status.SCHEDULE_PARAMETER_IS_NULL_ERROR, type);
                 }
 
                 Boolean isValid = quartzExecutor.isValid(param.getCrontab());

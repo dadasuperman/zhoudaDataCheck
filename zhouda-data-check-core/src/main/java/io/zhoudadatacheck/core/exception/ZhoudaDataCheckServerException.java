@@ -54,8 +54,17 @@ public class ZhoudaDataCheckServerException extends ZhoudaDataCheckException {
     }
 
     public ZhoudaDataCheckServerException(Status status, Object... statusParams) {
-        super(CollectionUtils.isEmpty(Arrays.asList(statusParams)) ? status.getMsg() : MessageFormat.format(status.getMsg(), statusParams));
+        super(CollectionUtils.isEmpty(Arrays.asList(statusParams)) ? status.getMsg() : MessageFormat.format(status.getMsg(), withoutNumberGrouping(statusParams)));
         this.status = status;
+    }
+
+    // MessageFormat renders numbers with grouping separators, which must not appear inside ids
+    private static Object[] withoutNumberGrouping(Object[] statusParams) {
+        Object[] formatted = new Object[statusParams.length];
+        for (int i = 0; i < statusParams.length; i++) {
+            formatted[i] = statusParams[i] instanceof Number ? String.valueOf(statusParams[i]) : statusParams[i];
+        }
+        return formatted;
     }
 
     public Status getStatus() {

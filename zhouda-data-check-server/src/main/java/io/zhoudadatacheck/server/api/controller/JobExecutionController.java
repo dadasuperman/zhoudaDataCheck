@@ -73,7 +73,7 @@ public class JobExecutionController {
     @ApiOperation(value = "get job execution status", response = String.class)
     @GetMapping(value = "/status/{executionId}")
     public Object getTaskStatus(@PathVariable("executionId") Long executionId) {
-        return jobExecutionService.getById(executionId).getStatus().getDescription();
+        return jobExecutionService.getJobExecutionStatus(executionId).getDescription();
     }
 
     @ApiOperation(value = "get job execution list by job id", response = JobExecution.class, responseContainer = "list")

@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 import {
-    TextInput, Button, Paper, Title, Stack, Center,
-} from '@mantine/core';
-import { Modal } from '@/ui/antdCompat';
-import { useForm as useAntdForm } from '@/ui/antdCompat/form';
+    Input, Button, Modal, Form,
+} from 'antd';
 import { useHistory } from 'react-router-dom';
 import { FormRender, IFormRender } from '@/common';
 import { useVerificationCode } from '@/hooks';
@@ -18,7 +16,7 @@ const Index = () => {
     const intl = useIntl();
     const [loading, setLoading] = useState(false);
     const { RenderImage, verificationCodeJwt } = useVerificationCode();
-    const [form] = useAntdForm();
+    const [form] = Form.useForm();
     const inputTip = intl.formatMessage({ id: 'common_input_tip' });
     const requiredTop = intl.formatMessage({ id: 'common_required_top' });
     const userNameText = intl.formatMessage({ id: 'userName_text' });
@@ -42,7 +40,7 @@ const Index = () => {
                     { required: true, message: `${userNameText}${requiredTop}` },
                     { pattern: /^[\u4E00-\u9FA5_a-zA-Z0-9]{2,32}$/, message: `${patternTip}${userNameText}` },
                 ],
-                widget: <TextInput autoComplete="off" placeholder={`${inputTip}${userNameText}`} />,
+                widget: <Input autoComplete="off" placeholder={`${inputTip}${userNameText}`} />,
             },
             {
                 label: (
@@ -59,7 +57,7 @@ const Index = () => {
                     { required: true, message: `${passwordText}${requiredTop}` },
                     { pattern: PWD_REG, message: `${patternTip}${passwordText}` },
                 ],
-                widget: <TextInput autoComplete="off" placeholder={`${inputTip}${passwordText}`} />,
+                widget: <Input.Password autoComplete="off" placeholder={`${inputTip}${passwordText}`} />,
             },
             {
                 label: emailText,
@@ -68,7 +66,7 @@ const Index = () => {
                     { required: true, message: `${emailText}${requiredTop}` },
                     { pattern: EMAIL_REG, message: `${patternTip}${emailText}` },
                 ],
-                widget: <TextInput autoComplete="off" placeholder={`${inputTip}${emailText}`} />,
+                widget: <Input autoComplete="off" placeholder={`${inputTip}${emailText}`} />,
             },
             {
                 label: phoneText,
@@ -76,7 +74,7 @@ const Index = () => {
                 rules: [
                     { required: true, message: `${phoneText}${requiredTop}` },
                 ],
-                widget: <TextInput autoComplete="off" placeholder={`${inputTip}${phoneText}`} />,
+                widget: <Input autoComplete="off" placeholder={`${inputTip}${phoneText}`} />,
             },
             {
                 label: `${verificationCodeText}`,
@@ -85,18 +83,19 @@ const Index = () => {
                     { required: true, message: `${verificationCodeText}${requiredTop}` },
                     { pattern: CODE_REG, message: `${patternTip}${verificationCodeText}` },
                 ],
-                widget: <TextInput
-                    autoComplete="off"
-                    rightSection={(
-                        <RenderImage
-                            style={{
-                                display: 'inline-block',
-                                height: '30px',
-                            }}
-                        />
-                    )}
-                    rightSectionWidth={100}
-                />,
+                widget: (
+                    <Input
+                        autoComplete="off"
+                        suffix={(
+                            <RenderImage
+                                style={{
+                                    display: 'inline-block',
+                                    height: '30px',
+                                }}
+                            />
+                        )}
+                    />
+                ),
             },
         ],
     };
@@ -120,6 +119,7 @@ const Index = () => {
                 });
             }
         } catch (error: any) {
+            // handled by http
         } finally {
             setLoading(false);
         }
@@ -128,10 +128,12 @@ const Index = () => {
         try {
             const values = await form.validateFields();
             onRegister(values);
-        } catch (error) {}
+        } catch (error) {
+            // validation failed
+        }
     };
     return (
-        <div className="dv-gray-bg" style={{ position: 'relative' }}>
+        <div className="dv-gray-bg" style={{ position: 'relative', minHeight: '100vh' }}>
             <GoBack
                 style={{
                     position: 'absolute',
@@ -144,31 +146,26 @@ const Index = () => {
             >
                 {intl.formatMessage({ id: 'common_back' })}
             </GoBack>
-            <Center mih="100vh" p="md">
-                <Paper shadow="xl" radius="md" p="xl" style={{ width: minWidth(420), maxWidth: 480 }}>
-                    <Stack>
-                        <Title order={2} ta="center" c="teal.8" style={{ fontFamily: '"DM Sans", sans-serif' }}>
-                            {intl.formatMessage({ id: 'register_title' })}
-                        </Title>
-                        <FormRender {...schema} form={form} />
-                        <Button
-                            loading={loading}
-                            onClick={btnClick}
-                            fullWidth
-                            size="md"
-                            color="teal"
-                        >
-                            {intl.formatMessage({ id: 'register_btn' })}
-                        </Button>
-                    </Stack>
-                </Paper>
-            </Center>
+            <div className="dv-register-wrap">
+                <div className="dv-register-card">
+                    <h2 className="dv-register-title">
+                        {intl.formatMessage({ id: 'register_title' })}
+                    </h2>
+                    <FormRender {...schema} form={form} />
+                    <Button
+                        type="primary"
+                        loading={loading}
+                        onClick={btnClick}
+                        block
+                        size="large"
+                        style={{ marginTop: 8 }}
+                    >
+                        {intl.formatMessage({ id: 'register_btn' })}
+                    </Button>
+                </div>
+            </div>
         </div>
     );
 };
-
-function minWidth(n: number) {
-    return `min(100%, ${n}px)`;
-}
 
 export default Index;

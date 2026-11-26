@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { AppShell, Burger, Group, ActionIcon, Tooltip } from '@mantine/core';
+import { Layout } from 'antd';
+import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons';
 import AsideMenu, { MenuItem } from '../MenuAside';
 import './index.less';
+
+const { Content, Sider } = Layout;
 
 type TMainProps = {
     menus: MenuItem[],
@@ -11,45 +14,41 @@ type TMainProps = {
 
 const MenuLayout: React.FC<TMainProps> = ({ children, menus, visible = true }) => {
     const [collapsed, setCollapsed] = useState(false);
-
+    const onCollapse = (bool: boolean) => {
+        setCollapsed(bool);
+    };
     if (!visible) {
         return <>{children}</>;
     }
-
     return (
-        <AppShell
-            navbar={{
-                width: collapsed ? 72 : 248,
-                breakpoint: 'sm',
-                collapsed: { mobile: collapsed, desktop: false },
-            }}
-            padding="md"
-            classNames={{
-                main: 'zd-appshell-main',
-                navbar: 'zd-appshell-navbar',
-            }}
-        >
-            <AppShell.Navbar p={0} className="zd-appshell-navbar">
-                <div className="zd-navbar-inner">
-                    <Group justify="flex-end" px="xs" pt="xs" mb={4}>
-                        <Tooltip label={collapsed ? 'Expand' : 'Collapse'} position="right">
-                            <ActionIcon
-                                variant="subtle"
-                                color="gray"
-                                onClick={() => setCollapsed((c) => !c)}
-                                aria-label="Toggle navbar"
-                            >
-                                <Burger opened={!collapsed} size="sm" color="#94a3b8" />
-                            </ActionIcon>
-                        </Tooltip>
-                    </Group>
-                    <AsideMenu menus={menus} collapsed={collapsed} />
-                </div>
-            </AppShell.Navbar>
-            <AppShell.Main>
-                {children}
-            </AppShell.Main>
-        </AppShell>
+        <Layout className="zd-main-layout">
+            <Layout>
+                <Sider
+                    className="zd-sider"
+                    style={{
+                        height: '100vh',
+                        overflow: 'auto',
+                    }}
+                    width={248}
+                    collapsedWidth={72}
+                    trigger={(
+                        <div style={{ position: 'absolute', right: 15, fontSize: 16 }}>
+                            {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                        </div>
+                    )}
+                    collapsed={collapsed}
+                    onCollapse={onCollapse}
+                    collapsible
+                >
+                    <AsideMenu menus={menus} />
+                </Sider>
+                <Layout className="zd-content-layout">
+                    <Content className="zd-content">
+                        {children}
+                    </Content>
+                </Layout>
+            </Layout>
+        </Layout>
     );
 };
 

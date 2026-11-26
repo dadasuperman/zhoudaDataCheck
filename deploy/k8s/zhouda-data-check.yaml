@@ -33,7 +33,7 @@ spec:
             - start_container
             - ''
           command:
-            - ZhoudaDataCheck-1.0.0-SNAPSHOT-bin/bin/zhouda-data-check-daemon.sh
+            - zhoudaDataCheck-1.0.0-bin/bin/zhouda-data-check-daemon.sh
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: mysql
@@ -44,7 +44,7 @@ spec:
               value: root
             - name: SPRING_DATASOURCE_PASSWORD
               value: 123456
-          image: 'registry.cn-shanghai.aliyuncs.com/luckydata/ZhoudaDataCheck:dev'
+          image: 'zhouda-data-check:1.0.0'
           imagePullPolicy: IfNotPresent
           name: ZhoudaDataCheck
           resources: {}
@@ -96,9 +96,9 @@ metadata:
   name: ZhoudaDataCheck
   namespace: bigdata
 spec:
-  ingressClassName: ZhoudaDataCheck
+  ingressClassName: nginx
   rules:
-    - host: www.ZhoudaDataCheck.com
+    - host: zhouda-data-check.local
       http:
         paths:
           - backend:

@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { Popover, Text } from '@mantine/core';
+import { Popover } from 'antd';
 import { useIntl } from 'react-intl';
 import { useSelector, useCommonActions } from '@/store';
 import shareData from '@/utils/shareData';
@@ -21,21 +21,10 @@ const SwitchLanguage: React.FC<{}> = () => {
     };
 
     return (
-        <Popover width={140} position="bottom">
-            <Popover.Target>
-                <Text
-                    component="span"
-                    onClick={swichFn}
-                    style={{ cursor: 'pointer' }}
-                >
-                    {localMap[locale]}
-                </Text>
-            </Popover.Target>
-            <Popover.Dropdown>
-                <Text size="sm" ta="center">
-                    {intl.formatMessage({ id: 'common_switch_language' })}
-                </Text>
-            </Popover.Dropdown>
+        <Popover content={intl.formatMessage({ id: 'common_switch_language' })}>
+            <span onClick={swichFn} style={{ cursor: 'pointer' }}>
+                {localMap[locale]}
+            </span>
         </Popover>
     );
 };

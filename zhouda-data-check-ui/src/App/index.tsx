@@ -3,7 +3,7 @@ import {
     HashRouter as Router, Route, Switch, Redirect,
 } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { Center, Loader } from '@mantine/core';
+import { Spin } from 'antd';
 import store, { useCommonActions } from '@/store';
 import { ConfigProviderWrap } from './ConfigProvider';
 import { generateRoute } from '../router/useRoute';
@@ -18,9 +18,16 @@ function App() {
     return (
         <Router>
             <Suspense fallback={(
-                <Center style={{ width: '100vw', height: '100vh' }}>
-                    <Loader color="teal" size="lg" />
-                </Center>
+                <div style={{
+                    width: '100vw',
+                    height: '100vh',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}
+                >
+                    <Spin size="large" />
+                </div>
             )}
             >
                 <Switch>

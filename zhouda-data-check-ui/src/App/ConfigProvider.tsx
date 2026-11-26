@@ -1,61 +1,37 @@
 import React from 'react';
-import { MantineProvider, createTheme } from '@mantine/core';
-import { Notifications } from '@mantine/notifications';
-import { ConfirmHost } from '@/ui/antdCompat';
-import '@mantine/core/styles.css';
-import '@mantine/notifications/styles.css';
-import '@mantine/dates/styles.css';
+import { ConfigProvider } from 'antd';
+import zhCN from 'antd/locale/zh_CN';
+import enUS from 'antd/locale/en_US';
+import { useSelector } from '@/store';
 
-const theme = createTheme({
-    primaryColor: 'teal',
-    primaryShade: 7,
-    fontFamily: '"IBM Plex Sans", "DM Sans", "Segoe UI", sans-serif',
-    headings: {
-        fontFamily: '"DM Sans", "IBM Plex Sans", sans-serif',
-        fontWeight: '650',
-    },
-    defaultRadius: 'sm',
-    colors: {
-        teal: [
-            '#f0fdfa',
-            '#ccfbf1',
-            '#99f6e4',
-            '#5eead4',
-            '#2dd4bf',
-            '#14b8a6',
-            '#0d9488',
-            '#0f766e',
-            '#115e59',
-            '#134e4a',
-        ],
-        slate: [
-            '#f8fafc',
-            '#f1f5f9',
-            '#e2e8f0',
-            '#cbd5e1',
-            '#94a3b8',
-            '#64748b',
-            '#475569',
-            '#334155',
-            '#1e293b',
-            '#0f172a',
-        ],
-    },
-    other: {
-        brand: 'zhoudaDataCheck',
-        accent: '#0F766E',
-        ink: '#1e293b',
-        surface: '#f1f5f9',
-    },
-});
-
-const ConfigProviderWrap: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-    <MantineProvider theme={theme} defaultColorScheme="light">
-        <Notifications position="top-right" zIndex={4000} />
-        <ConfirmHost />
-        {children}
-    </MantineProvider>
-);
+const ConfigProviderWrap: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const { prefixCls, locale } = useSelector((r) => r.commonReducer);
+    const getLocale = () => {
+        if (locale === 'zh_CN') {
+            return zhCN;
+        }
+        return enUS;
+    };
+    return (
+        <ConfigProvider
+            locale={getLocale()}
+            prefixCls={prefixCls}
+            theme={{
+                token: {
+                    colorPrimary: '#0F766E',
+                    colorInfo: '#0D9488',
+                    colorLink: '#0F766E',
+                    borderRadius: 6,
+                    fontFamily: '"IBM Plex Sans", "DM Sans", "Segoe UI", sans-serif',
+                    colorText: '#1E293B',
+                    colorBgLayout: '#F1F5F9',
+                },
+            }}
+        >
+            {children}
+        </ConfigProvider>
+    );
+};
 
 export {
     ConfigProviderWrap,

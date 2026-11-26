@@ -24,13 +24,21 @@
     <parent>
         <artifactId>zhouda-data-check</artifactId>
         <groupId>io.zhoudadatacheck</groupId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>zhouda-data-check-server</artifactId>
 
     <dependencies>
+        <dependency>
+            <groupId>io.zhoudadatacheck</groupId>
+            <artifactId>zhouda-data-check-server-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.zhoudadatacheck</groupId>
+            <artifactId>zhouda-data-check-dqc</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -471,30 +479,30 @@
         <dependency>
             <groupId>io.zhoudadatacheck</groupId>
             <artifactId>zhouda-data-check-notification-core</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.0</version>
         </dependency>
 
         <dependency>
             <groupId>io.zhoudadatacheck</groupId>
             <artifactId>zhouda-data-check-notification-plugin-email</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.0</version>
         </dependency>
 
         <dependency>
             <groupId>io.zhoudadatacheck</groupId>
             <artifactId>zhouda-data-check-notification-plugin-lark</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>io.zhoudadatacheck</groupId>
             <artifactId>zhouda-data-check-notification-plugin-dingtalk</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.0</version>
         </dependency>
 
         <dependency>
             <groupId>io.zhoudadatacheck</groupId>
             <artifactId>zhouda-data-check-notification-plugin-wecombot</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.0</version>
         </dependency>
 
         <dependency>

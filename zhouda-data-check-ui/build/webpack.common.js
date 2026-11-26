@@ -97,11 +97,6 @@ module.exports = {
             component: resolve('src/component'),
             assets: resolve('src/assets'),
             '@Editor': resolve('Editor'),
-            // Ant Design removed — route imports to Mantine-backed compat
-            antd$: resolve('src/ui/antdCompat/index.tsx'),
-            antd: resolve('src/ui/antdCompat'),
-            '@ant-design/icons$': resolve('src/ui/iconsCompat.tsx'),
-            '@ant-design/icons': resolve('src/ui/iconsCompat.tsx'),
         },
     },
     optimization: {

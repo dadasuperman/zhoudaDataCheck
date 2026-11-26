@@ -13,10 +13,7 @@
             "view/*": ["./src/view/*"],
             "store/*": ["./src/store/*"],
             "component/*": ["./src/component/*"],
-            "assets/*": ["./src/assets/*"],
-            "antd": ["./src/ui/antdCompat/index.tsx"],
-            "antd/*": ["./src/ui/antdCompat/*"],
-            "@ant-design/icons": ["./src/ui/iconsCompat.tsx"]
+            "assets/*": ["./src/assets/*"]
         },
         "outDir": "./dist",
         "module": "esnext",

@@ -66,6 +66,7 @@ public enum Status {
     GET_TABLE_LIST_ERROR(12010006, "Get DataSource {0} Database {1} Table List Error", "获取数据源 {0} 数据库 {1} 表列表错误"),
     GET_COLUMN_LIST_ERROR(12010007, "Get DataSource {0} Database {1} Table {2} Column List Error", "获取数据源 {0} 数据库 {1} 表 {2} 字段列表错误"),
     EXECUTE_SCRIPT_ERROR(12010008, "Execute Script {0} Error", "执行脚本 {0} 错误"),
+    DATASOURCE_TYPE_NOT_SUPPORT_ERROR(12010009, "DataSource Type {0} Not Support Error", "数据源类型 {0} 不支持"),
 
     TASK_NOT_EXIST_ERROR(13010001, "Task {0} Not Exist Error", "任务{0}不存在错误"),
     TASK_LOG_PATH_NOT_EXIST_ERROR(13010002, "Task {0} Log Path  Not Exist Error", "任务 {0} 的日志路径不存在错误"),
@@ -82,7 +83,7 @@ public enum Status {
     ENTITY_TYPE_NOT_EXIST(14010008, "The Column Type is not Exist", "列类型不存在"),
     METRIC_IS_NOT_EXIST(14010009, "The Metric {0} is not exist", "规则 {0} 不存在"),
     MULTI_TABLE_ACCURACY_NOT_SUPPORT_LOCAL_ENGINE(14010010, "Local Engine not support multi table accuracy in one datasource", "Local引擎不支持跨表准确性检查"),
-    JOB_PARAMETER_CONTAIN_DUPLICATE_METRIC_ERROR(14010011, "Job {0} Parameter Contain Duplicate Metric", "作业中存在重复的检查规则"),
+    JOB_PARAMETER_CONTAIN_DUPLICATE_METRIC_ERROR(14010011, "Job Parameter Contain Duplicate Metric", "作业中存在重复的检查规则"),
     JOB_SCHEDULE_EXIST_ERROR(14020001, "Job Schedule is Exist error, id must be not null", "作业定时任务已存在,ID 不能为空"),
     CREATE_JOB_SCHEDULE_ERROR(14020002, "Create Job Schedule {0} Error", "创建作业定时任务 {0} 错误"),
     JOB_SCHEDULE_NOT_EXIST_ERROR(14020003, "Job Schedule {0} is not Exist error", "作业定时任务 {0} 不存在错误"),
@@ -108,13 +109,14 @@ public enum Status {
     ERROR_DATA_STORAGE_NOT_EXIST_ERROR(17010002, "Error Data Storage {0} Not Exist Error", "错误数据存储 {0} 不存在"),
     ERROR_DATA_STORAGE_EXIST_ERROR(17010003, "Error Data Storage {0} is Exist error", "错误数据存储 {0} 已存在"),
     UPDATE_ERROR_DATA_STORAGE_ERROR(17010004, "Update Error Data Storage {0} Error", "更新 错误数据存储 {0} 错误"),
+    ERROR_DATA_STORAGE_TYPE_NOT_SUPPORT_ERROR(17010005, "Error Data Storage Type {0} Not Support Error", "错误数据存储类型 {0} 不支持"),
 
     SLA_ALREADY_EXIST_ERROR(18010001, "SLA {0} Already exist", "SLA {0} 已经存在"),
     SLA_SENDER_ALREADY_EXIST_ERROR(18020001, "SLA Sender {0}  Already exist", "SLA 发送器 {0} 已经存在"),
-    SLA_JOB_IS_NOT_EXIST_ERROR(18010003, "SLA job {0} is not exist", "SLA job {0} 存在"),
+    SLA_JOB_IS_NOT_EXIST_ERROR(18010003, "SLA job {0} is not exist", "SLA job {0} 不存在"),
 
-    CATALOG_FETCH_DATASOURCE_NULL_ERROR(19010001, "获取元数据时数据源为空", "DataSource must not be null when fetch metadata"),
-    CATALOG_FETCH_METADATA_PARAMETER_ERROR(19010002, "获取元数据参数错误", "Fetch Metadata Parameter Error"),
+    CATALOG_FETCH_DATASOURCE_NULL_ERROR(19010001, "DataSource must not be null when fetch metadata", "获取元数据时数据源为空"),
+    CATALOG_FETCH_METADATA_PARAMETER_ERROR(19010002, "Fetch Metadata Parameter Error", "获取元数据参数错误"),
 
     CATALOG_TAG_CATEGORY_CREATE_ERROR(20010001, "Create Tag Category {0} Error", "创建标签类别 {0} 错误"),
     CATALOG_TAG_CATEGORY_NOT_EXIST_ERROR(20010002, "Tag Category {0} Not Exist Error", "标签类别 {0} 不存在"),

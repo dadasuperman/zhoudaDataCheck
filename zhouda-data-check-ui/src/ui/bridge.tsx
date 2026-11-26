@@ -1,6 +1,6 @@
 /**
- * Preferred import path for new/migrated code: Mantine wrappers with antd-like names.
- * Prefer this over the webpack `antd` alias when touching a file.
+ * Compatibility re-exports — prefer importing from `antd` directly.
+ * Kept so any leftover `@/ui/bridge` imports keep working after Scheme A.
  */
 export {
     Button,
@@ -38,6 +38,10 @@ export {
     Segmented,
     Alert,
     InputNumber,
+    Upload,
+    Progress,
+    Badge,
+    Avatar,
+    Breadcrumb,
     ConfigProvider,
-    ConfirmHost,
-} from './antdCompat';
+} from 'antd';
